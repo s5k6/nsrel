@@ -1,0 +1,14 @@
+Discover namespace relationships.
+
+    nsrel (<nsfile> | <pid> <nstype>)
+
+Starting from the specified namespace, print (where applicable) its
+namespace ID, type, parent namespace ID, owning user namespace ID, and
+owning user ID.  Recursively close over parent and owning namespaces.
+
+In the output, `-` means not applicable, `<not implemented>` hints at
+the kernel lacking a feature, and `<oos>` refers to namespaces that
+are out of scope (which also applies to the non-existent parent of an
+initial namespace).
+
+For more information, see ioctl_ns(2), user_namespaces(7).
