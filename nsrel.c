@@ -29,23 +29,24 @@
 
 
 
-// Map namespace type identifier to namespace type name.
+/* Map namespace type identifier to namespace type name.  Use names as
+are used in `/proc/.../ns/` */
 
 char const * nstypename(int t) {
     if (t == CLONE_NEWCGROUP)
-        return "Cgroup";
+        return "cgroup";
     if (t == CLONE_NEWIPC)
-        return "IPC";
+        return "ipc";
     if (t == CLONE_NEWNET)
-        return "Network";
+        return "net";
     if (t == CLONE_NEWNS)
-        return "Mount";
+        return "mnt";
     if (t == CLONE_NEWPID)
-        return "PID";
+        return "pid";
     if (t == CLONE_NEWUSER)
-        return "User";
+        return "user";
     if (t == CLONE_NEWUTS)
-        return "UTS";
+        return "uts";
     return "<unknown>";
 }
 
@@ -128,7 +129,9 @@ int main(int argc, char **argv) {
     } else {
 
         printf(
+            "\n"
 #include "nsrel.help"
+            "\n"
         );
 
         return 0;
@@ -138,7 +141,7 @@ int main(int argc, char **argv) {
     if (isatty(1)) {
         printf(tabInit);
         printf(tabSet, 12);
-        printf(tabSet, 10);
+        printf(tabSet, 7);
         printf(tabSet, 12);
         printf(tabSet, 12);
         printf(tabDone);
