@@ -152,13 +152,20 @@ int main(int argc, char **argv) {
     while (COUNT(stack) > 0) {
         int fd = POP(stack);
 
+
+        // print the namespace ID
+
         ino_t id = fdino(fd);
 
         printf("%zu", id);
 
         printf("\t");
 
+
+        // print the namespace type
+
         int nstype = ioctl(fd, NS_GET_NSTYPE);
+
         if (nstype != -1)
             printf("%s", nstypename(nstype));
         else {
@@ -168,11 +175,16 @@ int main(int argc, char **argv) {
 
         printf("\t");
 
+
+        // print the parent namespace ID, if applicable
+
         int parent = ioctl(fd, NS_GET_PARENT);
+        ino_t parentId;  // later compared with userId
+
         if (parent != -1) {
-            ino_t parentId = fdino(parent);
+            parentId = fdino(parent);
             printf("%zu", parentId);
-            addIfNew(parent, parentId);
+            addIfNew(parent, parentId);  // put on stack if it's a new one
         } else {
             if (errno == EPERM)
                 printf("<oos>");
@@ -185,12 +197,23 @@ int main(int argc, char **argv) {
         }
 
         printf("\t");
+
+
+        // print associated user namespace
 
         int user = ioctl(fd, NS_GET_USERNS);
+
         if (user != -1) {
             ino_t userId = fdino(user);
-            printf("%zu", userId);
-            addIfNew(user, userId);
+            if ((parent != -1) && (userId == parentId))
+                /* User namespaces seem to report their parent as
+                associated user namespace.  Just print <parent> if
+                they really are the same. */
+                printf("<parent>");
+            else {
+                printf("%zu", userId);
+                addIfNew(user, userId);
+            }
         } else {
             if (errno == EPERM)
                 printf("<oos>");
@@ -203,6 +226,9 @@ int main(int argc, char **argv) {
         }
 
         printf("\t");
+
+
+        // print UID of namespace owner
 
         uid_t owner;
         int owner_valid = ioctl(fd, NS_GET_OWNER_UID, &owner) != -1;
